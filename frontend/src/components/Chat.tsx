@@ -4,7 +4,7 @@ import { API_BASE } from "../api";
 
 type Message = { role: "user" | "assistant"; content: string };
 
-export default function Chat({ model }: { model: string }) {
+export default function Chat() {
   const [q, setQ] = useState("");
   const [history, setHistory] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ export default function Chat({ model }: { model: string }) {
       const r = await fetch(`${API_BASE}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query, model, k: 5 }),
+      body: JSON.stringify({ query, k: 5 }),
       });
 
       if (!r.ok) {

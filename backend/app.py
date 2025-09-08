@@ -20,7 +20,7 @@ from deps import embed_texts
 from rag.store import VectorStore
 from rag.ingest import extract_text, chunk, prepare_metadatas
 from rag.retrieval import assemble_prompt, as_np
-from models.providers import MODEL_MAP, OLLAMA_MODEL
+from models.providers import call_grok
 
 app = FastAPI(title="Personalized Resume Assistant API")
 
@@ -83,7 +83,6 @@ async def ingest(file: UploadFile = File(...)):
 
 class ChatRequest(BaseModel):
     query: str
-    model: str = "local-llama"  # default to your local model key in MODEL_MAP
     k: int = 5
 
 
@@ -102,23 +101,8 @@ async def chat(req: ChatRequest):
     # Build prompt from retrieved context
     prompt = assemble_prompt(req.query, hits)
 
-    # Resolve the model function, with a fallback to the default local model
-    llm_fn = MODEL_MAP.get(req.model)
-    if llm_fn is None:
-        logger.warning(f"Model '{req.model}' not found. Falling back to 'local-llama'.")
-        llm_fn = MODEL_MAP.get("local-llama")
-
-    # If even the fallback is missing, it's a fatal configuration error
-    if llm_fn is None:
-        logger.error("Default fallback model 'local-llama' not found in MODEL_MAP.")
-        raise HTTPException(
-            status_code=500,
-            detail="Server is misconfigured: Default LLM provider 'local-llama' is not defined."
-        )
-        
     try:
-        # Call the model
-        answer = await llm_fn(prompt)
+        answer = await call_grok(prompt)
     except ValueError as e:
         # Catches configuration errors from providers, like a missing API key.
         logger.error(f"Configuration error in LLM provider: {e}")
@@ -134,9 +118,7 @@ async def chat(req: ChatRequest):
         )
     except httpx.HTTPStatusError as e:
         logger.error(f"LLM provider returned an error: {e.response.status_code} - {e.response.text}")
-        detail = f"The LLM service returned an error: {e.response.status_code}. "
-        if e.response.status_code == 404:
-            detail += f"This might mean the model '{OLLAMA_MODEL}' is not available. Try running 'ollama pull {OLLAMA_MODEL}'."
+        detail = f"The LLM service returned an error: {e.response.status_code}."
         raise HTTPException(
             status_code=502, # Bad Gateway
             detail=detail
