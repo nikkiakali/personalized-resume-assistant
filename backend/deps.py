@@ -1,22 +1,18 @@
+# backend/deps.py
 import os
-from dotenv import load_dotenv
-from openai import OpenAI
+from typing import List
 
-# Load environment variables from .env (safe if called multiple times)
-load_dotenv()
+try:
+    # fastembed >= 0.5
+    from fastembed import TextEmbedding
+except Exception:
+    # fallback for older fastembed (<0.5)
+    from fastembed.embedding import TextEmbedding  # type: ignore
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-EMBED_MODEL_NAME = os.getenv("EMBED_MODEL_NAME", "text-embedding-3-small")
+# 384-dim, small and fast
+EMBED_MODEL_NAME = os.getenv("EMBED_MODEL_NAME", "BAAI/bge-small-en-v1.5")
+_embedder = TextEmbedding(model_name=EMBED_MODEL_NAME)
 
-if not OPENAI_API_KEY:
-    raise RuntimeError("OPENAI_API_KEY is not set. Add it to backend/.env")
-
-# OpenAI client will read the key from env automatically
-client = OpenAI()
-
-def embed_texts(texts: list[str]) -> list[list[float]]:
-    """
-    Returns embeddings as a list of vectors (lists of floats).
-    """
-    resp = client.embeddings.create(model=EMBED_MODEL_NAME, input=texts)
-    return [d.embedding for d in resp.data]
+def embed_texts(texts: List[str]) -> List[List[float]]:
+    # FastEmbed yields numpy arrays; convert to lists
+    return [vec.tolist() for vec in _embedder.embed(texts, batch_size=64)]
