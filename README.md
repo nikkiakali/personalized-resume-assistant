@@ -1,12 +1,12 @@
-# AI Resume Assistant ✨
+# AI Resume Assistant
 
 Upload your resume + a job description → get **AI-powered, personalized feedback** on how well they align.  
 This project implements a modern **Retrieval-Augmented Generation (RAG)** pipeline to highlight skills, detect gaps, and suggest improvements for job seekers.
 
-- 🚀 Built with **FastAPI + React**
-- ⚡ Powered by **Groq Llama 3.1 8B** with automatic **Google Gemini fallback**
-- 📄 Supports **PDF, DOCX, TXT, and Markdown**
-- 🔍 Uses **FAISS vector search** + **fastembed** for high-performance retrieval
+- Built with **FastAPI + React**
+- Powered by **Groq Llama 3.1 8B** with automatic **Google Gemini fallback**
+- Supports **PDF, DOCX, TXT, and Markdown**
+- Uses **FAISS vector search** + **fastembed** for high-performance retrieval
 
 
 ## Features
@@ -18,7 +18,7 @@ This project implements a modern **Retrieval-Augmented Generation (RAG)** pipeli
 - **Async API**: Modern FastAPI backend with async-first design
 - **Simple REST Endpoints**: Easy to ingest documents and query them
 
-## 🛠 Tech Stack
+## Tech Stack
 ![Python](https://img.shields.io/badge/python-3.10-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-green)
 ![React](https://img.shields.io/badge/React-18-blue)
@@ -150,12 +150,9 @@ resume-assistant/
 - Multi-resume + multi-role comparisons
 - Integration with Job Tracker Chrome Extension
 
-## About
-Built by [Natasha Akali](https://github.com/nikkiakali) — turning ideas into products that help people.
-
 ---
 
-## Advanced Configuration ⚙️
+## Advanced Configuration
 
 ### Changing the Embedding Model
 
